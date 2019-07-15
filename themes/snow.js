@@ -4,6 +4,7 @@ import BaseTheme, { BaseTooltip } from './base';
 import LinkBlot from '../formats/link';
 import { Range } from '../core/selection';
 import icons from '../ui/icons';
+import { FormulaBlot } from '../modules/formula';
 
 const TOOLBAR_CONFIG = [
   [{ header: ['1', '2', '3', false] }],
@@ -56,12 +57,32 @@ class SnowTooltip extends BaseTooltip {
             this.position(this.quill.getBounds(this.linkRange));
             return;
           }
+          const [formula, foffset] = this.quill.scroll.descendant(
+            FormulaBlot,
+            range.index,
+          );
+          if (formula != null) {
+            this.linkRange = new Range(range.index - foffset, formula.length());
+            const fpreview = FormulaBlot.value(formula.domNode);
+            const inputpreview = this.root.querySelector('a.ql-preview');
+            inputpreview.value = fpreview;
+            this.show();
+            this.edit('formula', fpreview, { create: false });
+            this.position(this.quill.getBounds(this.linkRange));
+            return;
+          }
         } else {
           delete this.linkRange;
         }
         this.hide();
       },
     );
+
+    //   } else {
+    //     delete this.linkRange;
+    //   }
+    //   this.hide();
+    // });
   }
 
   show() {

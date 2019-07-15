@@ -367,7 +367,11 @@ function matchBlot(node, delta, scroll) {
     const value = match.value(node);
     if (value != null) {
       embed[match.blotName] = value;
-      return new Delta().insert(embed, match.formats(node, scroll));
+      // return new Delta().insert(embed, match.formats(node, scroll));
+      if (match.blotName === 'formula') {
+        embed.length = match.value(node).length;
+      }
+      delta = new Delta().insert(embed, match.formats(node));
     }
   } else {
     if (match.prototype instanceof BlockBlot && !deltaEndsWith(delta, '\n')) {
